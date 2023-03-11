@@ -52,7 +52,7 @@ import createFooterInfo from './modules/createFooterInfo.js';
         btnWrapper.append(...btns);
         return {
             btnWrapper,
-            btns
+            btns,
         };
     };
     const creteTable = () => {
@@ -62,10 +62,12 @@ import createFooterInfo from './modules/createFooterInfo.js';
         const thead = document.createElement('thead');
         thead.insertAdjacentHTML('beforeend', `
         <tr>
-        <th class="delete">Удалить</th>
+        
+        <th>Редактировтаь</th>
         <th>Имя</th>
         <th>Фамилия</th>
         <th>Телефон</th>
+        
         </tr>`);
 
         const tbody = document.createElement('tbody');
@@ -110,9 +112,13 @@ import createFooterInfo from './modules/createFooterInfo.js';
         ]);
         form.append(...btnGroup.btns);
         overlay.append(form);
+        const closeBtn = form.querySelector('.close');
         return {
             overlay,
             form,
+            closeBtn
+
+
         }
 
     };
@@ -143,17 +149,29 @@ import createFooterInfo from './modules/createFooterInfo.js';
 
         return {
             list: table.tbody,
+            logo,
+            btnAdd: btnGroup.btns[0],
+            formOverlay: form.overlay,
+            form: form.form,
+            closeBtn: form.closeBtn,
+
+
+
         }
     };
 
     const createRow = ({name:firstName, surname, phone}) => {
     const tr = document.createElement('tr');
 
-    const tdDel = document.createElement('td');
-    tdDel.classList.add('delete');
+    const tdControl = document.createElement('td');
+    tdControl.classList.add('control');
     const btnDel = document.createElement('button');
-    tdDel.append(btnDel);
-    btnDel.classList.add('del-icon');
+    const btnChange = document.createElement('button');
+    tdControl.append(btnDel,btnChange);
+    btnDel.classList.add('del-icon','mr-3');
+    btnDel.title = 'Удалить'
+    btnChange.classList.add('changeBtn');
+    btnChange.title = 'Редактировать';
 
     const tdName = document.createElement('td');
     tdName.textContent = firstName;
@@ -163,21 +181,47 @@ import createFooterInfo from './modules/createFooterInfo.js';
     const phoneLink = document.createElement('a');
     phoneLink.href = `tel:${phone}`;
     phoneLink.textContent = phone;
+    tr.phoneLink = phoneLink;
     tdPhone.append(phoneLink);
-    tr.append(tdDel, tdName,tdSurName,tdPhone);
+    tr.append(tdControl, tdName,tdSurName,tdPhone);
     return tr;
 }
     const renderContacts = (elem,data) => {
         const allRow = data.map(createRow);
         elem.append(...allRow);
+        return allRow;
     };
+    const hoverRow = (allRow, logo) => {
+        const text = logo.textContent;
+        allRow.forEach(contact => {
+            contact.addEventListener('mouseenter', () => {
+                logo.textContent = contact.phoneLink.textContent;
+            });
+            contact.addEventListener('mouseleave', () => {
+                logo.textContent = text;
+            });
+        });
+    }
     const init = (selectorApp, tittle) => {
         const app = document.querySelector(selectorApp);
         const phoneBook = renderPhoneBook(app, tittle);
-        const { list } = phoneBook;
-        renderContacts(list, data);
+        const { list, logo, btnAdd, formOverlay, form, closeBtn} = phoneBook;
         // Функционал
-    };
+        const allRow = renderContacts(list, data);
+       hoverRow(allRow, logo);
 
+        btnAdd.addEventListener('click', () => {
+            formOverlay.classList.add('is-visible');
+        });
+
+        formOverlay.addEventListener('click', (e) => {
+            let target = e.target;
+            if (target === closeBtn) {
+                formOverlay.classList.remove('is-visible')
+            } else if (target === formOverlay) {
+                formOverlay.classList.remove('is-visible')
+            }
+        });
+    };
     window.phoneBookInit = init;
 }
