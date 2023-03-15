@@ -21,11 +21,16 @@ const data = [
         phone: '+79876543210',
     },
 ];
+
 import createContainer from './modules/createContainer.js';
 import createHeader from  './modules/createHeader.js';
 import createFooter from './modules/createFooter.js';
 import createFooterInfo from './modules/createFooterInfo.js';
-{
+
+{   const addContactData = (contact) => {
+    data.push(contact);
+    console.log(data)
+    };
     const createLogo = (title) => {
         const h1 = document.createElement('h1');
         h1.classList.add('logo');
@@ -139,11 +144,11 @@ import createFooterInfo from './modules/createFooterInfo.js';
         },
     ]);
     const table = creteTable();
-    const form = createForm();
+    const {form, overlay} = createForm();
     const footer = createFooter();
     const footerInfo = createFooterInfo(title);
     header.headerContainer.append(logo)
-    main.mainContainer.append(btnGroup.btnWrapper, table, form.overlay);
+    main.mainContainer.append(btnGroup.btnWrapper, table, overlay);
     footer.footerContainer.append(footerInfo);
     app.append(header, main, footer)
 
@@ -153,8 +158,8 @@ import createFooterInfo from './modules/createFooterInfo.js';
             logo,
             btnAdd: btnGroup.btns[0],
             btnDel:btnGroup.btns[1],
-            formOverlay: form.overlay,
-            form: form.form,
+            formOverlay: overlay,
+            form,
             closeBtn: form.closeBtn,
 
 
@@ -207,39 +212,35 @@ import createFooterInfo from './modules/createFooterInfo.js';
                 logo.textContent = text;
             });
         });
-    }
+    } ;
 
+    const modalControl = (btnAdd, formOverlay, closeBtn) => {
 
-    const init = (selectorApp, tittle) => {
-        const app = document.querySelector(selectorApp);
-        const phoneBook = renderPhoneBook(app, tittle);
-        const { list, logo, btnAdd, btnDel, formOverlay, form, closeBtn, listHead} = phoneBook;
-        // Функционал
-        const allRow = renderContacts(list, data);
-       hoverRow(allRow, logo);
-
-
-
-        btnAdd.addEventListener('click', () => {
+        const openModal =() => {
             formOverlay.classList.add('is-visible');
-        });
+        };
+        const closeModal =() => {
+            formOverlay.classList.remove('is-visible')
+        };
 
-
-        listHead.addEventListener('click',(e)=>{
-            let target = e.target;
-            if (target.closest('.th-name')) {
-                console.log('Кликкк')
-            }
-        });
+        btnAdd.addEventListener('click', openModal);
 
         formOverlay.addEventListener('click', (e) => {
             let target = e.target;
             if (target === closeBtn) {
-                formOverlay.classList.remove('is-visible')
-            } else if (target === formOverlay || target.closest('.close-btn')) {
-                formOverlay.classList.remove('is-visible')
+                closeModal();
+            } else if (target === formOverlay ||
+                target.closest('.close-btn') ||
+                target.closest('.close')) {
+                closeModal();
             }
         });
+        return {
+            closeModal,
+        }
+    };
+
+    const deleteControl = (btnDel, list) => {
         btnDel.addEventListener('click', () => {
             document.querySelectorAll('.del-icon').forEach(elem => {
                 elem.classList.toggle('del-icon_visible')
@@ -251,6 +252,37 @@ import createFooterInfo from './modules/createFooterInfo.js';
 
             }
         })
+    };
+    const addContactPage =(newContact, list) => {
+    list.append(createRow(newContact));
+    }
+    const formControl =(form,list, closeModal) => {
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const newContact = Object.fromEntries(formData);
+            addContactPage(newContact, list);
+            addContactData(newContact);
+            form.reset();
+            closeModal();
+        })
+    }
+
+    const init = (selectorApp, tittle) => {
+        const app = document.querySelector(selectorApp);
+
+        const { list, logo, btnAdd, btnDel, formOverlay, form, closeBtn} = renderPhoneBook(app, tittle);
+        // Функционал
+        const allRow = renderContacts(list, data);
+        const {closeModal} =  modalControl(btnAdd, formOverlay,closeBtn);
+
+        hoverRow(allRow, logo);
+        deleteControl(btnDel, list);
+        formControl(form, list, closeModal);
+
+
+
+
 
 
     };
