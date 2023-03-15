@@ -64,7 +64,7 @@ import createFooterInfo from './modules/createFooterInfo.js';
         <tr>
         
         <th>Редактировтаь</th>
-        <th>Имя</th>
+        <th class="th-name">Имя</th>
         <th>Фамилия</th>
         <th>Телефон</th>
         
@@ -94,7 +94,7 @@ import createFooterInfo from './modules/createFooterInfo.js';
             <input class="form-input" name="surname" id="surname" type="text" required>
         </div>
          <div class="form-group">
-            <label class="form-label" for="phone">Имя:</label>
+            <label class="form-label" for="phone">Телефон:</label>
             <input class="form-input" name="phone" id="phone" type="number" required>
         </div>
         `);
@@ -105,7 +105,7 @@ import createFooterInfo from './modules/createFooterInfo.js';
                 text:'Добавить',
             },
             {
-                className:'btn btn-danger',
+                className:'btn btn-danger close-btn',
                 type:'reset',
                 text:'Отмена',
             },
@@ -149,8 +149,10 @@ import createFooterInfo from './modules/createFooterInfo.js';
 
         return {
             list: table.tbody,
+            listHead: table.tHead,
             logo,
             btnAdd: btnGroup.btns[0],
+            btnDel:btnGroup.btns[1],
             formOverlay: form.overlay,
             form: form.form,
             closeBtn: form.closeBtn,
@@ -162,21 +164,23 @@ import createFooterInfo from './modules/createFooterInfo.js';
 
     const createRow = ({name:firstName, surname, phone}) => {
     const tr = document.createElement('tr');
-
+    tr.classList.add('contact');
     const tdControl = document.createElement('td');
     tdControl.classList.add('control');
     const btnDel = document.createElement('button');
     const btnChange = document.createElement('button');
     tdControl.append(btnDel,btnChange);
-    btnDel.classList.add('del-icon','mr-3');
+    btnDel.classList.add('mr-3','del-icon');
     btnDel.title = 'Удалить'
     btnChange.classList.add('changeBtn');
     btnChange.title = 'Редактировать';
 
     const tdName = document.createElement('td');
     tdName.textContent = firstName;
+    tdName.classList.add('td-Name');
     const tdSurName = document.createElement('td');
     tdSurName.textContent = surname;
+    tdSurName.classList.add('td-sur-name');
     const tdPhone = document.createElement('td');
     const phoneLink = document.createElement('a');
     phoneLink.href = `tel:${phone}`;
@@ -184,11 +188,13 @@ import createFooterInfo from './modules/createFooterInfo.js';
     tr.phoneLink = phoneLink;
     tdPhone.append(phoneLink);
     tr.append(tdControl, tdName,tdSurName,tdPhone);
+
     return tr;
 }
     const renderContacts = (elem,data) => {
         const allRow = data.map(createRow);
         elem.append(...allRow);
+
         return allRow;
     };
     const hoverRow = (allRow, logo) => {
@@ -202,26 +208,51 @@ import createFooterInfo from './modules/createFooterInfo.js';
             });
         });
     }
+
+
     const init = (selectorApp, tittle) => {
         const app = document.querySelector(selectorApp);
         const phoneBook = renderPhoneBook(app, tittle);
-        const { list, logo, btnAdd, formOverlay, form, closeBtn} = phoneBook;
+        const { list, logo, btnAdd, btnDel, formOverlay, form, closeBtn, listHead} = phoneBook;
         // Функционал
         const allRow = renderContacts(list, data);
        hoverRow(allRow, logo);
 
+
+
         btnAdd.addEventListener('click', () => {
             formOverlay.classList.add('is-visible');
+        });
+
+
+        listHead.addEventListener('click',(e)=>{
+            let target = e.target;
+            if (target.closest('.th-name')) {
+                console.log('Кликкк')
+            }
         });
 
         formOverlay.addEventListener('click', (e) => {
             let target = e.target;
             if (target === closeBtn) {
                 formOverlay.classList.remove('is-visible')
-            } else if (target === formOverlay) {
+            } else if (target === formOverlay || target.closest('.close-btn')) {
                 formOverlay.classList.remove('is-visible')
             }
         });
+        btnDel.addEventListener('click', () => {
+            document.querySelectorAll('.del-icon').forEach(elem => {
+                elem.classList.toggle('del-icon_visible')
+            })
+        });
+        list.addEventListener('click', (e) => {
+            if (e.target.closest('.del-icon')) {
+                e.target.closest('.contact').remove();
+
+            }
+        })
+
+
     };
     window.phoneBookInit = init;
 }

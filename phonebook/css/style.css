@@ -29,6 +29,7 @@ body {
   display: flex;
   align-items: center;
 }
+
 .changeBtn {
   width: 20px;
   height: 20px;
@@ -52,7 +53,9 @@ body {
   background-repeat: no-repeat;
   background-position: center;
 }
-
+.del-icon_visible {
+  display: block;
+}
 .delete.is-visible {
   width: 10px;
   display: table-cell;
