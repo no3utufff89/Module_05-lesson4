@@ -1,4 +1,4 @@
-const data = [
+let data = [
   {
     name: 'Иван',
     surname: 'Петров',
