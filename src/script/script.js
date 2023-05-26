@@ -7,6 +7,11 @@ import {renderPhoneBook,
 import {modalControl,
         deleteControl,
         formControl,} from './modules/controls.js'
+
+
+import '../css/style.css';
+import '../scss/index.scss';
+
 {
     const init = (selectorApp, tittle) => {
         const app = document.querySelector(selectorApp);

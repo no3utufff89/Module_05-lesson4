@@ -1,9 +1,10 @@
-import {createFooter, createFooterInfo, createHeader, createLogo, createMain} from "./elementsBuilder.js";
+import {createFooter, createFooterInfo, createHeader, createLogo, createMain, createImageLogo} from "./elementsBuilder.js";
 import createButtonsGroup from "./createButtonsGroup.js";
 import * as createInterface from "./createInterface.js";
 
 export const renderPhoneBook = (app, title) => {
     const header = createHeader();
+    const imageLogo = createImageLogo();
     const logo = createLogo(title);
     const main = createMain();
     const btnGroup = createButtonsGroup([
@@ -22,7 +23,7 @@ export const renderPhoneBook = (app, title) => {
     const {form, overlay} = createInterface.createForm();
     const footer = createFooter();
     const footerInfo = createFooterInfo(title);
-    header.headerContainer.append(logo)
+    header.headerContainer.append(imageLogo, logo)
     main.mainContainer.append(btnGroup.btnWrapper, table, overlay);
     footer.footerContainer.append(footerInfo);
     app.append(header, main, footer)
